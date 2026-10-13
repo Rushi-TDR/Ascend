@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!-- VERSION LOG
+  v0.2 — version label moved to bottom-left corner of the app; title and welcome heading restored to "Ascend".
+  v0.1 — renamed to "Habit Tracker v0.1"; login fields wrapped in a form (fixes wrong save-password popup); dead code removed.
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -1021,14 +1025,16 @@
     </div>
 
     <p class="auth-error" id="authError" style="display:none"></p>
+    <form id="authForm" novalidate onsubmit="return false">
     <label>Email
-      <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" />
+      <input id="authEmail" type="email" autocomplete="username" placeholder="you@example.com" />
     </label>
     <label>Password
       <input id="authPassword" type="password" autocomplete="current-password" placeholder="" />
     </label>
     <button id="authSubmitBtn" class="auth-primary" type="button">Continue</button>
     <button id="authForgotBtn" class="auth-link" type="button" style="display:none">Forgot password?</button>
+    </form>
     <p class="auth-note" id="authNote">On this device for now — real cross-device accounts are coming with the full app.</p>
   </div>
 </div>
@@ -3041,5 +3047,6 @@
   initAuthScreen();
 })();
 </script>
+<div id="appVersion" style="position:fixed;left:10px;bottom:calc(6px + env(safe-area-inset-bottom, 0px));z-index:10;font-size:11px;opacity:.55;color:var(--text-muted);pointer-events:none;">v0.2</div>
 </body>
 </html>
