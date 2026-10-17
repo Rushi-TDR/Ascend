@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <!-- VERSION LOG
+  v0.5 — manual payments: GCash / GoTyme QR + reference number, pending payment requests, approved by the owner in Supabase.
+  v0.4 — Premium shop (6 paid cosmetics, Supporter Pack, x2 Points Potion), locked purchases table in Supabase.
+  v0.3 — installable app (PWA): manifest, icons, offline support (sw.js).
   v0.2 — version label moved to bottom-left corner of the app; title and welcome heading restored to "Ascend".
   v0.1 — renamed to "Habit Tracker v0.1"; login fields wrapped in a form (fixes wrong save-password popup); dead code removed.
 -->
@@ -8,6 +11,13 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>Ascend — Habit Tracker</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<meta name="theme-color" content="#070605" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Ascend" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 <link rel="icon" type="image/png" href="data:image/png;base64,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">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -881,6 +891,43 @@
   .fx-royal i{ background: radial-gradient(circle, #fff, rgba(240,192,90,.6) 40%, transparent 72%); }
   .fx-frost i{ background: radial-gradient(circle, #fff, rgba(125,211,252,.6) 40%, transparent 72%); }
   .fx-champion i{ background: radial-gradient(circle, #fff, rgba(244,114,182,.6) 40%, transparent 72%); }
+  /* ===== Premium shop (v0.4) ===== */
+  a.unlock-btn{ display: inline-block; text-decoration: none; text-align: center; }
+  @keyframes galaxyGlow{ 0%,100%{ box-shadow: 0 0 22px -5px #7c3aed; } 50%{ box-shadow: 0 0 28px -3px #38bdf8; } }
+  @keyframes neonPulse{ 0%,100%{ box-shadow: 0 0 14px -4px #22d3ee, 0 0 30px -10px #e879f9; } 50%{ box-shadow: 0 0 22px -2px #e879f9, 0 0 38px -8px #22d3ee; } }
+  @keyframes phoenixGlow{ 0%,100%{ box-shadow: 0 0 22px -5px #f97316; } 50%{ box-shadow: 0 0 30px -3px #fbbf24; } }
+  .profile-avatar-wrap.fr-galaxy{ background: linear-gradient(var(--surface-2), var(--surface-2)) padding-box, conic-gradient(from var(--ang, 0deg), #1e1b4b, #7c3aed, #38bdf8, #c4b5fd, #1e1b4b) border-box; animation: spinRing 26s linear infinite, galaxyGlow 6s ease-in-out infinite; }
+  .profile-avatar-wrap.fr-neon{ background: linear-gradient(var(--surface-2), var(--surface-2)) padding-box, conic-gradient(from var(--ang, 0deg), #22d3ee, #e879f9, #22d3ee, #e879f9, #22d3ee) border-box; animation: spinRing 8s linear infinite, neonPulse 2.4s ease-in-out infinite; }
+  .profile-avatar-wrap.fr-phoenix{ background: linear-gradient(var(--surface-2), var(--surface-2)) padding-box, conic-gradient(from var(--ang, 0deg), #dc2626, #f97316, #fde047, #f97316, #dc2626) border-box; animation: spinRing 10s linear infinite, phoenixGlow 3s ease-in-out infinite; }
+  .fx-galaxy i, .fx-neon i{ left: var(--x); top: var(--y); width: var(--s); height: var(--s); border-radius: 50%; animation: twinkle var(--t) ease-in-out infinite; animation-delay: var(--d); }
+  .fx-galaxy i{ background: radial-gradient(circle, #fff, rgba(167,139,250,.6) 40%, transparent 72%); }
+  .fx-neon i{ background: radial-gradient(circle, #fff, rgba(232,121,249,.6) 40%, transparent 72%); }
+  .fx-phoenix i{
+    left: var(--x); bottom: var(--b); width: var(--s); height: calc(var(--s) * 1.7);
+    border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+    background: radial-gradient(circle at 50% 72%, #fef08a, #f97316 58%, transparent 74%);
+    animation: emberRise var(--t) ease-out infinite; animation-delay: var(--d);
+  }
+  @media (prefers-reduced-motion: reduce){ .profile-avatar-wrap.fr-galaxy, .profile-avatar-wrap.fr-neon, .profile-avatar-wrap.fr-phoenix{ animation: none; } .garden-koi i, .garden-fairy, .garden-fairy::after{ animation: none; } }
+
+  @keyframes koiSwim{ 0%{ transform: translateX(-26px) scaleX(1); } 49%{ transform: translateX(26px) scaleX(1); } 50%{ transform: translateX(26px) scaleX(-1); } 99%{ transform: translateX(-26px) scaleX(-1); } 100%{ transform: translateX(-26px) scaleX(1); } }
+  .garden-koi{ position: relative; width: 84px; height: 32px; border-radius: 50%; margin: 0 10px 4px; overflow: hidden; background: radial-gradient(ellipse at 40% 35%, #a7f3d0, #0e7490 62%, #164e63); box-shadow: 0 0 0 3px #8c6a45, inset 0 0 8px rgba(0,0,0,.3); }
+  .garden-koi i{ position: absolute; left: 36px; top: 9px; width: 13px; height: 6px; border-radius: 60% 40% 40% 60%; background: #fb923c; animation: koiSwim 7s linear infinite; }
+  .garden-koi i + i{ top: 18px; width: 11px; height: 5px; background: #fef3c7; animation-duration: 9s; animation-delay: -4s; }
+  @keyframes fairyTwinkle{ 0%,100%{ opacity: .5; } 50%{ opacity: 1; } }
+  .garden-fairy{ position: absolute; left: 0; right: 0; top: 22px; height: 12px; z-index: 1; pointer-events: none;
+    background: linear-gradient(rgba(255,255,255,.28), rgba(255,255,255,.28)) 0 4px / 100% 1px no-repeat, radial-gradient(circle at 6px 6px, #fff3b0 0 2.5px, transparent 3.5px) 0 0 / 28px 12px repeat-x;
+    filter: drop-shadow(0 0 4px #ffc94d); animation: fairyTwinkle 2.6s ease-in-out infinite; }
+  .garden-fairy::after{ content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 6px 6px, #f9a8d4 0 2.5px, transparent 3.5px) 14px 0 / 28px 12px repeat-x; animation: fairyTwinkle 2.6s ease-in-out infinite; animation-delay: -1.3s; }
+  .garden-greenhouse{ position: relative; width: 64px; height: 44px; margin: 0 10px 2px; align-self: flex-end; border: 2px solid rgba(220,245,255,.85); border-bottom-width: 3px; border-radius: 30px 30px 4px 4px / 22px 22px 4px 4px; background: linear-gradient(180deg, rgba(186,230,253,.35), rgba(186,230,253,.12)); box-shadow: inset 0 0 10px rgba(255,255,255,.25); }
+  .garden-greenhouse::before{ content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(220,245,255,.7); box-shadow: -16px 0 0 rgba(220,245,255,.5), 16px 0 0 rgba(220,245,255,.5); }
+  .garden-greenhouse::after{ content: ""; position: absolute; left: 8px; right: 8px; bottom: 3px; height: 16px; background: radial-gradient(circle at 20% 70%, #4fb35f 0 6px, transparent 7px), radial-gradient(circle at 55% 60%, #3f9b4f 0 7px, transparent 8px), radial-gradient(circle at 85% 70%, #f472b6 0 4px, transparent 5px); }
+  /* ===== Pay modal (v0.5) ===== */
+  #payOverlay .modal{ max-height: 92vh; overflow-y: auto; }
+  #payCancel{ background: var(--surface-2); color: var(--text-muted); }
+  #paySubmit{ background: var(--accent); color: #0c0c0d; }
+  #paySubmit:disabled{ opacity: .5; }
+  .pay-qr{ width: 100%; max-width: 230px; border-radius: 12px; background: #fff; padding: 8px; box-sizing: border-box; }
 </style>
 </head>
 <body>
@@ -1049,6 +1096,18 @@
   <div class="modal-actions"><button id="confirmCancel" type="button">Cancel</button><button id="confirmOk" type="button"></button></div>
 </div></div>
 <div class="loader" id="loader"><img id="loaderLogo" alt="Ascend" /><div class="loader-bar"><span></span></div><p>Preparing your climb...</p></div>
+<div class="modal-overlay" id="payOverlay"><div class="modal">
+  <h2 id="payTitle">Buy</h2>
+  <p class="modal-note" id="payAmount" style="margin:0 0 12px"></p>
+  <div class="type-toggle" id="payMethods"></div>
+  <div id="payQrBox" style="text-align:center;margin-bottom:12px"></div>
+  <p class="modal-note" id="payCode" style="margin:0 0 12px"></p>
+  <label>Reference number from your receipt
+    <input id="payRef" type="text" maxlength="40" autocomplete="off" placeholder="e.g. 1234 567 890123" />
+  </label>
+  <p class="modal-note" id="payMsg" style="margin:0 0 12px"></p>
+  <div class="modal-actions"><button id="payCancel" type="button">Close</button><button id="paySubmit" type="button">I've paid</button></div>
+</div></div>
 <div class="toast" id="toast" role="status"></div>
 <div class="rankup" id="rankUp"><div class="rankup-card">
   <div class="rankup-badge" id="rankUpBadge"></div>
@@ -1320,6 +1379,7 @@
           syncDirty = true;
         }
         cloudReady = true;
+        loadPurchases();
         if(syncDirty) pushCloud();
       });
     }).catch(function(e){ syncWarn("Cloud sync failed", e); });
@@ -1519,6 +1579,7 @@
     var flushed = (sb && syncDirty) ? pushCloud() : Promise.resolve();
     flushed.then(function(){
       cloudReady = false; cloudUid = null;
+      prem = { items: {}, potions: 0, until: 0, loaded: false };
       if(sb){ try { sb.auth.signOut(); } catch(e){} }
     });
     currentUser = null;
@@ -1604,11 +1665,11 @@
 
   function earnPoints(amount){
     state.lifetimePoints += amount;
-    state.pointsBalance += amount;
+    state.pointsBalance += amount * (potionActive() ? 2 : 1);
   }
   function reversePoints(amount){
     state.lifetimePoints = Math.max(0, state.lifetimePoints - amount);
-    state.pointsBalance = Math.max(0, state.pointsBalance - amount);
+    state.pointsBalance = Math.max(0, state.pointsBalance - amount * (potionActive() ? 2 : 1));
   }
 
   function addGoal(goal){ state.goals.push(goal); }
@@ -1876,6 +1937,176 @@
     {id:"b_crown",type:"badge",name:"Crown badge",desc:"Shown next to your title.",cost:120}
   ];
   function owns(id){ return state.shop.owned.indexOf(id) !== -1; }
+
+  /* ----- premium shop (paid with real money; ownership lives in Supabase "purchases", written only by the payment webhook) ----- */
+  // Payment links go here once the provider is approved, keyed by item id, e.g.  f_galaxy: "https://...".
+  // The signed-in user's id is appended as client_reference_id so the webhook can credit the right account
+  // (the parameter name may change to match the provider).
+  var CHECKOUT_LINKS = {};
+  var PREMIUM = [
+    {id:"f_galaxy",type:"frame",name:"Galaxy frame",desc:"A slow violet and blue starfield ring.",price:"\u20b199"},
+    {id:"f_neon",type:"frame",name:"Neon frame",desc:"A pulsing cyan and magenta ring.",price:"\u20b199"},
+    {id:"f_phoenix",type:"frame",name:"Phoenix frame",desc:"Gold and red flames with rising embers.",price:"\u20b199"},
+    {id:"koi",type:"garden",name:"Koi pond",desc:"A pond with two koi swimming back and forth.",price:"\u20b199"},
+    {id:"fairy",type:"garden",name:"Fairy lights",desc:"A twinkling string of lights across the garden.",price:"\u20b199"},
+    {id:"greenhouse",type:"garden",name:"Greenhouse",desc:"A glass house with plants inside.",price:"\u20b199"},
+    {id:"supporter_pack",type:"pack",name:"Supporter Pack",desc:"All six premium items above, forever.",price:"\u20b1299"}
+  ];
+  var POTIONS = [
+    {key:"potion_x2",name:"x2 Points Potion",desc:"One potion.",price:"\u20b149"},
+    {key:"potion_x2_x3",name:"x2 Points Potion \u00d7 3",desc:"Three potions at a lower price.",price:"\u20b1119"}
+  ];
+  var PREMIUM_FRAME_IDS = ["f_galaxy", "f_neon", "f_phoenix"];
+  var PREMIUM_COSMETIC_IDS = ["f_galaxy", "f_neon", "f_phoenix", "koi", "fairy", "greenhouse"];
+  var prem = { items: {}, potions: 0, until: 0, loaded: false };
+
+  function ownsPremium(id){
+    return !!(prem.items[id] || (PREMIUM_COSMETIC_IDS.indexOf(id) !== -1 && prem.items.supporter_pack));
+  }
+  function potionActive(){ return prem.until > Date.now(); }
+
+  function loadPurchases(){
+    if(!sb || !cloudUid) return Promise.resolve();
+    var uid = cloudUid;
+    return Promise.all([
+      sb.from("purchases").select("item_id,qty"),
+      sb.from("potion_uses").select("expires_at"),
+      sb.from("purchase_requests").select("item_key,method,status,created_at")
+    ]).then(function(r){
+      if(cloudUid !== uid || r[0].error || r[1].error) return;
+      var items = {}, bought = 0, until = 0, uses = r[1].data || [];
+      (r[0].data || []).forEach(function(p){ if(p.item_id === "potion_x2") bought += p.qty; else items[p.item_id] = true; });
+      uses.forEach(function(u){ var t = Date.parse(u.expires_at); if(t > until) until = t; });
+      prem = { items: items, potions: Math.max(0, bought - uses.length), until: until, loaded: true, requests: (r[2] && !r[2].error && r[2].data) || [] };
+      render();
+    }).catch(function(){});
+  }
+  window.addEventListener("focus", function(){ loadPurchases(); });
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) loadPurchases(); });
+
+  function buyHref(key){
+    var base = CHECKOUT_LINKS[key];
+    if(!base || !cloudUid) return null;
+    return base + (base.indexOf("?") === -1 ? "?" : "&") + "client_reference_id=" + encodeURIComponent(cloudUid);
+  }
+  function buyBtn(key, price){
+    if(!cloudUid) return '<button class="unlock-btn" disabled>Log in to buy</button>';
+    var href = buyHref(key);
+    if(href) return '<a class="unlock-btn" href="' + href + '" target="_blank" rel="noopener">Buy \u00b7 ' + price + '</a>';
+    if(isPending(key)) return '<button class="unlock-btn" disabled>Waiting for confirmation</button>';
+    return '<button class="unlock-btn pay-open" data-key="' + key + '" data-price="' + price + '">Buy \u00b7 ' + price + '</button>';
+  }
+  function premItem(i, gardenOn){
+    var has = ownsPremium(i.id), inline = has && i.type !== "frame", act;
+    if(has) act = i.type === "frame"
+      ? '<button class="unlock-btn prem-equip" data-id="' + i.id + '">' + (state.shop.frame === i.id ? "Unequip" : "Equip") + '</button>'
+      : '<span class="feature-state unlocked">Owned</span>';
+    else act = buyBtn(i.id, i.price);
+    var note = (i.type === "garden" && !gardenOn) ? " Shows once Habit Garden is unlocked." : "";
+    return '<div class="feature-item"><div class="feature-top"><div><div class="feature-name">' + i.name + '</div><div class="feature-desc">' + i.desc + note + '</div></div>' + (inline ? act : "") + '</div>' + (inline ? "" : act) + '</div>';
+  }
+  function potionHtml(){
+    var active = potionActive();
+    var until = active ? new Date(prem.until).toLocaleString([], {weekday: "short", hour: "numeric", minute: "2-digit"}) : "";
+    var drink = '<button class="unlock-btn potion-drink"' + ((!prem.potions || active) ? " disabled" : "") + '>' + (active ? "Active" : "Drink potion") + '</button>';
+    var rows = POTIONS.map(function(p){
+      return '<div class="feature-item"><div class="feature-top"><div><div class="feature-name">' + p.name + '</div><div class="feature-desc">' + p.desc + '</div></div></div>' + buyBtn(p.key, p.price) + '</div>';
+    }).join("");
+    return '<div class="feature-item"><div class="feature-top"><div><div class="feature-name">Your potions: ' + prem.potions + '</div><div class="feature-desc">' +
+      (active ? 'x2 points active until ' + until + '.' : 'Doubles the points you can spend for 24 hours. Rank progress is not affected.') + '</div></div>' + drink + '</div></div>' + rows;
+  }
+  var PAY_METHODS = [
+    {id:"gcash", name:"GCash", qr:"qr-gcash.png"},
+    {id:"gotyme", name:"GoTyme", qr:"qr-gotyme.png"}
+  ];
+  var payKey = null, payMethod = "gcash";
+  function itemName(key){
+    var all = PREMIUM.map(function(i){ return {id:i.id, name:i.name}; }).concat(POTIONS.map(function(p){ return {id:p.key, name:p.name}; }));
+    for(var i = 0; i < all.length; i++){ if(all[i].id === key) return all[i].name; }
+    return key;
+  }
+  function isPending(key){
+    return (prem.requests || []).some(function(r){ return r.item_key === key && r.status === "pending"; });
+  }
+  function methodName(id){ return id === "gotyme" ? "GoTyme" : "GCash"; }
+  function requestsHtml(){
+    var rs = (prem.requests || []).filter(function(r){ return r.status !== "approved"; })
+      .sort(function(a, b){ return String(b.created_at).localeCompare(String(a.created_at)); }).slice(0, 5);
+    if(!rs.length) return "";
+    return '<div class="panel-header secondary"><h2>Payments</h2></div><div class="features-card">' + rs.map(function(r){
+      return '<div class="feature-item"><div class="feature-top"><div><div class="feature-name">' + itemName(r.item_key) + '</div><div class="feature-desc">' + methodName(r.method) + '</div></div>' +
+        '<span class="feature-state ' + (r.status === "pending" ? "locked" : "locked") + '">' + (r.status === "pending" ? "Waiting for confirmation" : "Not confirmed") + '</span></div></div>';
+    }).join("") + '</div>';
+  }
+  function payCode(){ return "ASC-" + String(cloudUid || "").replace(/-/g, "").slice(0, 6).toUpperCase(); }
+  function setPayMsg(t){ document.getElementById("payMsg").textContent = t || ""; }
+  function renderPayMethods(){
+    var box = document.getElementById("payMethods");
+    box.innerHTML = PAY_METHODS.map(function(m){ return '<button type="button" class="type-btn' + (m.id === payMethod ? " active" : "") + '" data-m="' + m.id + '">' + m.name + '</button>'; }).join("");
+    Array.prototype.forEach.call(box.querySelectorAll(".type-btn"), function(b){
+      b.addEventListener("click", function(){ payMethod = b.dataset.m; renderPayMethods(); });
+    });
+    var m = PAY_METHODS.filter(function(x){ return x.id === payMethod; })[0];
+    var qr = document.getElementById("payQrBox");
+    qr.innerHTML = "";
+    var img = new Image();
+    img.className = "pay-qr"; img.alt = m.name + " QR code";
+    img.onerror = function(){ qr.innerHTML = '<p class="modal-note" style="margin:0">This QR is not available yet. Try the other method.</p>'; };
+    img.src = m.qr;
+    qr.appendChild(img);
+  }
+  function openPay(key, price){
+    payKey = key;
+    document.getElementById("payTitle").textContent = "Buy " + itemName(key);
+    document.getElementById("payAmount").textContent = "Send exactly " + price + " using the QR, then enter the reference number from your receipt.";
+    document.getElementById("payCode").textContent = "Tip: type " + payCode() + " in the message or notes field when you pay.";
+    document.getElementById("payRef").value = "";
+    setPayMsg("");
+    renderPayMethods();
+    document.getElementById("payOverlay").classList.add("open");
+  }
+  function submitPay(){
+    var ref = document.getElementById("payRef").value.trim().replace(/\s+/g, " ");
+    if(!/^[A-Za-z0-9 -]{4,40}$/.test(ref)){ setPayMsg("Enter the reference number from your receipt (letters and numbers only)."); return; }
+    if(!sb || !cloudUid || !payKey) return;
+    var btn = document.getElementById("paySubmit");
+    btn.disabled = true;
+    sb.from("purchase_requests").insert({ user_id: cloudUid, item_key: payKey, method: payMethod, payer_ref: ref }).then(function(res){
+      btn.disabled = false;
+      if(res.error){ setPayMsg(res.error.code === "23505" ? "That reference number was already used." : "Could not send the request. Try again."); return; }
+      document.getElementById("payOverlay").classList.remove("open");
+      showToast("Payment sent for checking. It unlocks once confirmed.", "Dismiss", function(){});
+      loadPurchases();
+    }, function(){ btn.disabled = false; setPayMsg("Could not send the request. Check your connection."); });
+  }
+  document.getElementById("payCancel").addEventListener("click", function(){ document.getElementById("payOverlay").classList.remove("open"); });
+  document.getElementById("paySubmit").addEventListener("click", submitPay);
+
+  function premiumHtml(gardenOn){
+    return '<div class="panel-header secondary"><h2>Premium</h2></div><div class="features-card">' + PREMIUM.map(function(i){ return premItem(i, gardenOn); }).join("") + '</div>' +
+      '<div class="panel-header secondary"><h2>Potions</h2></div><div class="features-card">' + potionHtml() + '</div>' + requestsHtml();
+  }
+  function premiumBind(el){
+    Array.prototype.forEach.call(el.querySelectorAll(".prem-equip"), function(b){
+      b.addEventListener("click", function(){
+        var id = b.dataset.id; if(!ownsPremium(id)) return;
+        state.shop.frame = state.shop.frame === id ? null : id;
+        persistAndRender();
+      });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll(".pay-open"), function(b){
+      b.addEventListener("click", function(){ openPay(b.dataset.key, b.dataset.price); });
+    });
+    var d = el.querySelector(".potion-drink");
+    if(d) d.addEventListener("click", function(){
+      if(!sb || !cloudUid) return;
+      d.disabled = true;
+      sb.rpc("activate_potion").then(function(res){
+        if(res && res.error) showToast("Could not start the potion. Try again.", "Dismiss", function(){});
+        loadPurchases();
+      }, function(){ d.disabled = false; });
+    });
+  }
   function badgeSvg(id){
     var d = { b_sprout: '<path d="M12 21v-9M12 12c-4 0-6-2-6-6 4 0 6 2 6 6zM12 12c0-4 2-7 7-7 0 4-2 7-7 7z" fill="currentColor" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>',
       b_bolt: '<polygon points="13,2 5,13 11,13 10,22 19,10 13,10" fill="currentColor"/>',
@@ -1887,7 +2118,7 @@
     var t = SHOP.filter(function(i){ return i.id === state.shop.title; })[0], b = state.shop.badge;
     return (t || b) ? '<p class="profile-title">' + (b ? '<span class="badge-ico">' + badgeSvg(b) + '</span>' : "") + (t ? t.name : "") + '</p>' : "";
   }
-  function frameClass(){ return state.shop.frame ? "fr-" + state.shop.frame.slice(2) : ""; }
+  function frameClass(){ var f = state.shop.frame; if(!f) return ""; if(PREMIUM_FRAME_IDS.indexOf(f) !== -1 && !ownsPremium(f)) return ""; return "fr-" + f.slice(2); }
   function decorHtml(){
     var wm = '<svg viewBox="0 0 60 70" width="54" height="64" class="windmill"><path d="M22 68L26 28h8l4 40z" fill="#e9dcc6"/><path d="M23 29h14l-7-9z" fill="#b5483a"/><g class="blades"><rect x="29" y="2" width="2.4" height="24" fill="#f4efe4"/><rect x="29" y="26" width="2.4" height="24" fill="#f4efe4"/><rect x="6" y="25" width="24" height="2.4" fill="#f4efe4"/><rect x="30" y="25" width="24" height="2.4" fill="#f4efe4"/></g><circle cx="30.2" cy="26.2" r="3" fill="#b5483a"/></svg>';
     return (owns("fence") ? '<div class="garden-fence"></div>' : "") +
@@ -1897,6 +2128,9 @@
       (owns("lanterns") ? '<span class="garden-lantern"></span>' : "") +
       (owns("bench") ? '<span class="garden-bench"></span>' : "") +
       (owns("pond") ? '<span class="garden-pond"></span>' : "") +
+      (ownsPremium("koi") ? '<span class="garden-koi"><i></i><i></i></span>' : "") +
+      (ownsPremium("greenhouse") ? '<span class="garden-greenhouse"></span>' : "") +
+      (ownsPremium("fairy") ? '<span class="garden-fairy"></span>' : "") +
       (owns("lanterns") ? '<span class="garden-lantern"></span>' : "") +
       (owns("butterflies") ? '<span class="bfly b1"></span><span class="bfly b2"></span><span class="bfly b3"></span>' : "");
   }
@@ -1911,7 +2145,7 @@
       return '<div class="feature-item"><div class="feature-top"><div><div class="feature-name">' + i.name + '</div><div class="feature-desc">' + i.desc + (i.type === "garden" && !gardenOn ? " Needs Habit Garden." : "") + '</div></div>' + (has && i.type === "garden" ? act : "") + '</div>' + (has && i.type === "garden" ? "" : act) + '</div>';
     }
     function sect(t, h){ return '<div class="panel-header secondary"><h2>' + h + '</h2></div><div class="features-card">' + SHOP.filter(function(i){ return i.type === t && !i.prize; }).map(item).join("") + '</div>'; }
-    el.innerHTML = '<div class="shop-balance">Balance <strong>' + state.pointsBalance + ' pts</strong></div>' + sect("garden", "Garden items") + sect("title", "Profile titles") + sect("badge", "Profile badges") + sect("frame", "Profile frames");
+    el.innerHTML = '<div class="shop-balance">Balance <strong>' + state.pointsBalance + ' pts</strong></div>' + premiumHtml(gardenOn) + sect("garden", "Garden items") + sect("title", "Profile titles") + sect("badge", "Profile badges") + sect("frame", "Profile frames");
     Array.prototype.forEach.call(el.querySelectorAll(".shop-buy"), function(b){
       b.addEventListener("click", function(){
         var i = SHOP.filter(function(x){ return x.id === b.dataset.id; })[0];
@@ -1928,6 +2162,7 @@
         persistAndRender();
       });
     });
+    premiumBind(el);
   }
 
   /* ----- weekly quests ----- */
@@ -2083,20 +2318,20 @@
       "fr-vine":   [[10,6,8,0,6,8],[90,14,7,1.5,7,-8],[50,-6,8,3,6.5,5],[26,-2,6,4.2,7.5,-6],[78,0,7,2.2,6.8,7],[97,56,6,5,7,-10]],
       "fr-aurora": [[8,18,5,0,4,0],[92,30,6,1.3,4.6,0],[50,-4,5,2.6,4.2,0],[24,2,4,3.4,5,0],[80,4,5,.8,4.4,0],[98,70,4,2,5.2,0],[2,64,4,3.8,4.8,0]]
     };
-    return (sets[f] || (f === "fr-royal" || f === "fr-frost" || f === "fr-champion" ? sets["fr-aurora"] : [])).map(function(a){
+    return (sets[f] || (f === "fr-phoenix" ? sets["fr-flame"] : (f === "fr-royal" || f === "fr-frost" || f === "fr-champion" || f === "fr-galaxy" || f === "fr-neon" ? sets["fr-aurora"] : []))).map(function(a){
       return '<i style="--x:' + a[0] + '%;--y:' + a[1] + 'px;--b:' + a[1] + 'px;--s:' + a[2] + 'px;--d:' + a[3] + 's;--t:' + a[4] + 's;--dx:' + a[5] + 'px"></i>';
     }).join("");
   }
 
   function frameChooserHtml(){
-    var frames = SHOP.filter(function(i){ return i.type === "frame"; }), cur = state.shop.frame || "";
+    var frames = SHOP.filter(function(i){ return i.type === "frame"; }).concat(PREMIUM.filter(function(i){ return i.type === "frame"; })), cur = state.shop.frame || "";
     function opt(id, name, cls, locked){
       return '<button type="button" class="frame-opt' + (!locked && cur === id ? " on" : "") + (locked ? " locked" : "") + '" data-frame="' + id + '">' +
         '<span class="profile-avatar-wrap frame-mini ' + cls + '"></span><span class="frame-name">' + name + '</span>' +
-        (locked ? '<span class="frame-sub">' + (id === "f_champion" ? "Monthly prize" : "Get in Shop") + '</span>' : '') + '</button>';
+        (locked ? '<span class="frame-sub">' + (id === "f_champion" ? "Monthly prize" : (PREMIUM_FRAME_IDS.indexOf(id) !== -1 ? "Premium" : "Get in Shop")) + '</span>' : '') + '</button>';
     }
     return '<div class="panel-header"><h2>Profile frame</h2></div><div class="frame-picker">' + opt("", "Default", "", false) +
-      frames.map(function(f){ return opt(f.id, f.name.replace(" frame", ""), "fr-" + f.id.slice(2), !owns(f.id)); }).join("") + '</div>';
+      frames.map(function(f){ return opt(f.id, f.name.replace(" frame", ""), "fr-" + f.id.slice(2), (PREMIUM_FRAME_IDS.indexOf(f.id) !== -1 ? !ownsPremium(f.id) : !owns(f.id))); }).join("") + '</div>';
   }
 
   /* ----- sound + haptics ----- */
@@ -2815,7 +3050,7 @@
     Array.prototype.forEach.call(el.querySelectorAll(".frame-opt"), function(b){
       b.addEventListener("click", function(){
         var id = b.dataset.frame;
-        if(id && !owns(id)){ document.querySelector('.tab-btn[data-tab="' + (id === "f_champion" ? "goals" : "shop") + '"]').click(); return; }
+        if(id && (PREMIUM_FRAME_IDS.indexOf(id) !== -1 ? !ownsPremium(id) : !owns(id))){ document.querySelector('.tab-btn[data-tab="' + (id === "f_champion" ? "goals" : "shop") + '"]').click(); return; }
         state.shop.frame = id || null;
         persistAndRender();
       });
@@ -3047,6 +3282,13 @@
   initAuthScreen();
 })();
 </script>
-<div id="appVersion" style="position:fixed;left:10px;bottom:calc(6px + env(safe-area-inset-bottom, 0px));z-index:10;font-size:11px;opacity:.55;color:var(--text-muted);pointer-events:none;">v0.2</div>
+<div id="appVersion" style="position:fixed;left:10px;bottom:calc(6px + env(safe-area-inset-bottom, 0px));z-index:10;font-size:11px;opacity:.55;color:var(--text-muted);pointer-events:none;">v0.5</div>
+<script>
+if ("serviceWorker" in navigator && location.protocol === "https:") {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
+</script>
 </body>
 </html>
