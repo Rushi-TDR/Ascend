@@ -1,9 +1,9 @@
-// Ascend service worker — v0.5
+// Ascend service worker — v0.5.1
 // Same-origin files: network first (so updates arrive), cache as offline fallback.
 // CDN scripts/fonts: serve from cache, refresh in background.
 // Supabase and everything else: never touched.
-const CACHE = "ascend-v0.5";
-const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"];
+const CACHE = "ascend-v0.5.1";
+const SHELL = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png"];
 const CDN_HOSTS = ["cdn.jsdelivr.net", "fonts.googleapis.com", "fonts.gstatic.com"];
 
 self.addEventListener("install", (e) => {
