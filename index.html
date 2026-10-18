@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <!-- VERSION LOG
+  v0.6.1 — testing tools (+points, reset buttons) now show only for admin accounts.
+  v0.6 — trowel item, shop prices x2, separate Balance and Lifetime boxes, richer premium effects.
   v0.5.1 — app icons now loaded from the repo root (fixes missing home-screen icon and offline install).
   v0.5 — manual payments: GCash / GoTyme QR + reference number, pending payment requests, approved by the owner in Supabase.
   v0.4 — Premium shop (6 paid cosmetics, Supporter Pack, x2 Points Potion), locked purchases table in Supabase.
@@ -929,6 +931,118 @@
   #paySubmit{ background: var(--accent); color: #0c0c0d; }
   #paySubmit:disabled{ opacity: .5; }
   .pay-qr{ width: 100%; max-width: 230px; border-radius: 12px; background: #fff; padding: 8px; box-sizing: border-box; }
+  /* ===== v0.6: header boxes, premium look, effects ===== */
+  .stat.lifetime{ background: color-mix(in srgb, #8ab4ff 13%, transparent); border-color: color-mix(in srgb, #8ab4ff 36%, transparent); }
+  .stat.lifetime .stat-icon, .stat.lifetime .stat-value{ color: #8ab4ff; }
+
+  .features-card .feature-item.premium{
+    position: relative; overflow: hidden; margin-top: 10px; padding: 12px;
+    border: 1.5px solid transparent; border-radius: 14px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--surface-2) 88%, #a78bfa), var(--surface-2)) padding-box,
+                conic-gradient(from var(--ang, 0deg), #f7d88a, #a78bfa, #38bdf8, #f472b6, #f7d88a) border-box;
+    animation: spinRing 9s linear infinite;
+  }
+  .features-card .feature-item.premium:first-child{ margin-top: 0; }
+  .features-card .feature-item.premium.owned{ animation-duration: 18s; }
+  .feature-item.premium::after{
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.11) 50%, transparent 62%);
+    transform: translateX(-130%); animation: shimmerSweep 6s ease-in-out infinite;
+  }
+  @keyframes shimmerSweep{ 0%,55%{ transform: translateX(-130%); } 100%{ transform: translateX(130%); } }
+  .feature-item.premium .feature-top{ justify-content: flex-start; gap: 12px; }
+  .feature-item.premium .feature-top > .unlock-btn, .feature-item.premium .feature-top > .feature-state{ margin-left: auto; }
+  .prem-text{ flex: 1; min-width: 0; }
+  .feature-item.premium > .unlock-btn{ margin-top: 10px; width: 100%; }
+
+  .prem-preview{ flex-shrink: 0; position: relative; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; }
+  .prem-preview.frame .avatar-fx{ position: absolute; left: 50%; top: 50%; margin: 0; transform: translate(-50%, -50%) scale(.52); }
+  .prem-preview.scene{ width: 96px; height: 56px; border-radius: 10px; overflow: hidden; align-items: flex-end; background: linear-gradient(180deg, #355f3f, #274d31); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+  .prem-preview.scene .garden-koi{ margin: 0 0 6px; transform: scale(.82); transform-origin: bottom center; }
+  .prem-preview.scene .garden-greenhouse{ margin: 0 0 4px; }
+  .prem-preview.scene .garden-fairy{ top: 10px; }
+  .prem-preview.packbox, .prem-preview.potionbox, .prem-preview.trowelbox{ width: 56px; }
+
+  .pack-gem{ width: 38px; height: 38px; clip-path: polygon(50% 0, 100% 34%, 50% 100%, 0 34%); background: linear-gradient(135deg, #fde68a, #c4b5fd 50%, #38bdf8); animation: gemShine 3.2s ease-in-out infinite; }
+  @keyframes gemShine{ 0%,100%{ transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 6px rgba(167,139,250,.6)) brightness(1); } 50%{ transform: scale(1.08) rotate(4deg); filter: drop-shadow(0 0 13px rgba(125,211,252,.9)) brightness(1.25); } }
+
+  .potion{ position: relative; width: 34px; height: 46px; }
+  .potion::before{ content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32px; border-radius: 7px 7px 17px 17px / 9px 9px 18px 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,.4) 0 16%, #f7d88a 16%, #fb923c 100%);
+    box-shadow: inset 0 0 8px rgba(255,255,255,.45), 0 0 14px rgba(251,146,60,.6); animation: potionGlow 2.6s ease-in-out infinite; }
+  .potion::after{ content: ""; position: absolute; left: 11px; top: 0; width: 12px; height: 17px; border-radius: 3px 3px 0 0; border: 1px solid rgba(255,255,255,.45);
+    background: linear-gradient(180deg, #8c6a45 0 5px, rgba(255,255,255,.22) 5px); }
+  .potion i{ position: absolute; bottom: 6px; width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,.85); z-index: 1; animation: bubbleUp 2.4s ease-in infinite; }
+  .potion i:nth-child(1){ left: 8px; } .potion i:nth-child(2){ left: 19px; animation-delay: .8s; } .potion i:nth-child(3){ left: 14px; animation-delay: 1.6s; width: 3px; height: 3px; }
+  @keyframes bubbleUp{ 0%{ transform: translateY(0) scale(.6); opacity: 0; } 25%{ opacity: .95; } 100%{ transform: translateY(-22px) scale(1); opacity: 0; } }
+  @keyframes potionGlow{ 0%,100%{ filter: brightness(1); } 50%{ filter: brightness(1.2); } }
+
+  .trowel{ position: relative; width: 34px; height: 34px; transform: rotate(40deg); }
+  .trowel::before{ content: ""; position: absolute; left: 11px; top: 0; width: 12px; height: 21px; clip-path: polygon(50% 0, 100% 70%, 82% 100%, 18% 100%, 0 70%); background: linear-gradient(135deg, #f3f4f6, #9ca3af); }
+  .trowel::after{ content: ""; position: absolute; left: 15px; top: 20px; width: 4px; height: 14px; border-radius: 2px; background: linear-gradient(90deg, #a8793f, #6b4a26); }
+  .garden-cell.dig{ cursor: pointer; animation: digHint 2.4s ease-in-out infinite; }
+  @keyframes digHint{ 0%,100%{ filter: drop-shadow(0 0 0 rgba(247,216,138,0)); } 50%{ filter: drop-shadow(0 0 6px rgba(247,216,138,.95)); } }
+
+  /* premium frames: halos and orbiting lights around the avatar */
+  .avatar-fx.fx-galaxy .profile-avatar-wrap, .avatar-fx.fx-neon .profile-avatar-wrap, .avatar-fx.fx-phoenix .profile-avatar-wrap{ position: relative; z-index: 1; }
+  .avatar-fx.fx-galaxy::before, .avatar-fx.fx-galaxy::after, .avatar-fx.fx-neon::before, .avatar-fx.fx-neon::after, .avatar-fx.fx-phoenix::before, .avatar-fx.fx-phoenix::after{ content: ""; position: absolute; border-radius: 50%; pointer-events: none; z-index: 0; }
+  @keyframes haloSpin{ to{ transform: rotate(360deg); } }
+  @keyframes haloSpinRev{ to{ transform: rotate(-360deg); } }
+  @keyframes neonBreath{ 0%,100%{ opacity: .55; } 50%{ opacity: 1; } }
+  @keyframes phoenixFlicker{ from{ transform: scale(.97); opacity: .75; } to{ transform: scale(1.06); opacity: 1; } }
+  .avatar-fx.fx-galaxy::before{ inset: -14px; background: conic-gradient(from 0deg, rgba(124,58,237,0), rgba(124,58,237,.75), rgba(56,189,248,.7), rgba(196,181,253,.55), rgba(124,58,237,0));
+    -webkit-mask: radial-gradient(closest-side, transparent 80%, #000 84%, #000 96%, transparent 100%); mask: radial-gradient(closest-side, transparent 80%, #000 84%, #000 96%, transparent 100%);
+    filter: blur(1.2px); animation: haloSpin 16s linear infinite; }
+  .avatar-fx.fx-galaxy::after{ inset: -10px; background: conic-gradient(from 0deg, transparent 0 84%, rgba(255,255,255,.95) 99%, transparent 100%);
+    -webkit-mask: radial-gradient(closest-side, transparent 86%, #000 88%, #000 95%, transparent 97%); mask: radial-gradient(closest-side, transparent 86%, #000 88%, #000 95%, transparent 97%);
+    animation: haloSpin 4.6s linear infinite; }
+  .avatar-fx.fx-neon::before{ inset: -12px; background: conic-gradient(from 0deg, #22d3ee, rgba(34,211,238,0) 25%, #e879f9 50%, rgba(232,121,249,0) 75%, #22d3ee);
+    -webkit-mask: radial-gradient(closest-side, transparent 82%, #000 85%, #000 94%, transparent 98%); mask: radial-gradient(closest-side, transparent 82%, #000 85%, #000 94%, transparent 98%);
+    filter: blur(2px); animation: haloSpinRev 7s linear infinite, neonBreath 2.4s ease-in-out infinite; }
+  .avatar-fx.fx-neon::after{ inset: -9px; background: conic-gradient(from 0deg, transparent 0 40%, #22d3ee 44%, transparent 47% 86%, #e879f9 90%, transparent 93%);
+    -webkit-mask: radial-gradient(closest-side, transparent 86%, #000 88%, #000 95%, transparent 97%); mask: radial-gradient(closest-side, transparent 86%, #000 88%, #000 95%, transparent 97%);
+    animation: haloSpin 3.2s linear infinite; }
+  .avatar-fx.fx-neon i:nth-child(even){ background: radial-gradient(circle, #fff, rgba(34,211,238,.65) 40%, transparent 72%); }
+  .avatar-fx.fx-phoenix::before{ inset: -16px; background: radial-gradient(closest-side, transparent 74%, rgba(251,191,36,.55) 82%, rgba(249,115,22,.4) 90%, rgba(220,38,38,.16) 96%, transparent 100%); animation: phoenixFlicker 1.3s ease-in-out infinite alternate; }
+  .avatar-fx.fx-phoenix::after{ inset: -6px; box-shadow: 0 0 20px 3px rgba(249,115,22,.55), inset 0 0 14px rgba(251,191,36,.22); animation: phoenixFlicker 1.7s ease-in-out infinite alternate-reverse; }
+
+  /* premium garden items: more life */
+  @keyframes waterShimmer{ from{ filter: brightness(1); } to{ filter: brightness(1.2) saturate(1.1); } }
+  @keyframes ripple{ 0%{ transform: scale(.3); opacity: .8; } 100%{ transform: scale(2.6); opacity: 0; } }
+  .garden-koi{ background: radial-gradient(circle at 80% 58%, #86efac 0 5px, transparent 6px), radial-gradient(circle at 82% 52%, #f9a8d4 0 2.6px, transparent 3.4px), radial-gradient(circle at 24% 66%, #4ade80 0 3.6px, transparent 4.4px), radial-gradient(ellipse at 40% 35%, #a7f3d0, #0e7490 62%, #164e63); animation: waterShimmer 4s ease-in-out infinite alternate; }
+  .garden-koi::before, .garden-koi::after{ content: ""; position: absolute; left: 46%; top: 46%; width: 16px; height: 8px; margin: -4px 0 0 -8px; border-radius: 50%; border: 1px solid rgba(255,255,255,.6); opacity: 0; animation: ripple 3.4s ease-out infinite; }
+  .garden-koi::after{ left: 30%; top: 60%; animation-delay: 1.7s; }
+  .garden-koi i::after{ content: ""; position: absolute; left: -6px; top: 0; width: 7px; height: 100%; background: inherit; clip-path: polygon(100% 50%, 0 0, 0 100%); }
+
+  @keyframes fairySway{ from{ transform: rotate(-.5deg); } to{ transform: rotate(.5deg); } }
+  @keyframes sparkleFall{ 0%{ transform: translateY(0) scale(.6); opacity: 0; } 20%{ opacity: 1; } 100%{ transform: translateY(42px) scale(.2); opacity: 0; } }
+  .garden-fairy{ transform-origin: top center; animation: fairyTwinkle 2.6s ease-in-out infinite, fairySway 7s ease-in-out infinite alternate; }
+  .garden-fairy i{ position: absolute; top: 8px; width: 3px; height: 3px; border-radius: 50%; background: #fff3b0; box-shadow: 0 0 6px 1px #ffd86b; opacity: 0; animation: sparkleFall 3.6s ease-in infinite; }
+  .garden-fairy i:nth-child(1){ left: 12%; } .garden-fairy i:nth-child(2){ left: 38%; animation-delay: 1.2s; } .garden-fairy i:nth-child(3){ left: 63%; animation-delay: .6s; } .garden-fairy i:nth-child(4){ left: 86%; animation-delay: 2.1s; }
+
+  @keyframes glassSheen{ from{ background-position: 160% 0, 0 0; } to{ background-position: -60% 0, 0 0; } }
+  @keyframes plantSway{ from{ transform: rotate(-2deg) scaleY(1); } to{ transform: rotate(2deg) scaleY(1.06); } }
+  @keyframes fireflyDrift{ 0%{ transform: translate(0,0); opacity: .2; } 50%{ opacity: 1; } 100%{ transform: translate(8px,-7px); opacity: .35; } }
+  .garden-greenhouse{ background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,.34) 48%, transparent 58%) 0 0 / 260% 100% no-repeat, linear-gradient(180deg, rgba(186,230,253,.38), rgba(254,243,199,.14));
+    box-shadow: inset 0 0 16px rgba(255,236,170,.4), 0 0 18px rgba(186,230,253,.28); animation: glassSheen 5.5s linear infinite; }
+  .garden-greenhouse::after{ transform-origin: bottom center; animation: plantSway 3.8s ease-in-out infinite alternate; }
+  .garden-greenhouse i{ position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fef9c3; box-shadow: 0 0 7px 2px rgba(253,224,71,.85); z-index: 1; animation: fireflyDrift 4.4s ease-in-out infinite alternate; }
+  .garden-greenhouse i:nth-child(1){ left: 14px; top: 20px; } .garden-greenhouse i:nth-child(2){ left: 36px; top: 12px; animation-delay: -1.4s; } .garden-greenhouse i:nth-child(3){ left: 46px; top: 26px; animation-delay: -2.6s; }
+
+  @media (max-width: 520px){
+    .stats{ flex-wrap: wrap; }
+    .stat{ flex: 1 1 28%; padding: 6px 6px; gap: 5px; }
+    .stat-icon svg{ width: 17px; height: 17px; }
+    .stat-value{ font-size: 14.5px; }
+    .stat-label{ font-size: 9.5px; }
+    .rank-badge{ flex: 1 1 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .feature-item.premium, .feature-item.premium::after, .pack-gem, .potion::before, .potion i, .garden-cell.dig,
+    .avatar-fx.fx-galaxy::before, .avatar-fx.fx-galaxy::after, .avatar-fx.fx-neon::before, .avatar-fx.fx-neon::after, .avatar-fx.fx-phoenix::before, .avatar-fx.fx-phoenix::after,
+    .garden-koi, .garden-koi::before, .garden-koi::after, .garden-fairy, .garden-fairy i, .garden-greenhouse, .garden-greenhouse::after, .garden-greenhouse i{ animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -940,7 +1054,8 @@
     </div>
     <div class="stats">
       <div class="stat streak"><span class="stat-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M12 2c.5 3 5 5.5 5 10.5a5 5 0 0 1-10 0c0-2 .9-3.4 2-4.5.2 1.5.9 2.2 1.8 2.5C10.6 7.5 10.8 4.5 12 2z"/></svg></span><span class="stat-body"><span class="stat-value" id="streakValue">0</span><span class="stat-label">Daily Streak</span></span></div>
-      <div class="stat points"><span class="stat-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><polygon points="12,2 14.9,8.6 22,9.3 16.6,14 18.2,21 12,17.3 5.8,21 7.4,14 2,9.3 9.1,8.6"/></svg></span><span class="stat-body"><span class="stat-value" id="pointsValue">0</span><span class="stat-label">Points</span></span></div>
+      <div class="stat points"><span class="stat-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><polygon points="12,2 14.9,8.6 22,9.3 16.6,14 18.2,21 12,17.3 5.8,21 7.4,14 2,9.3 9.1,8.6"/></svg></span><span class="stat-body"><span class="stat-value" id="pointsValue">0</span><span class="stat-label">Balance</span></span></div>
+      <div class="stat lifetime"><span class="stat-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true"><path d="M7 3h10v4a5 5 0 0 1-10 0V3zm-2 1H3v2a3 3 0 0 0 3 3V7a1 1 0 0 1-1-1V4zm14 0h2v2a3 3 0 0 1-3 3V7a1 1 0 0 0 1-1V4zM10.5 13h3v3h-3zM8 20h8v2H8z"/></svg></span><span class="stat-body"><span class="stat-value" id="lifetimeValue">0</span><span class="stat-label">Lifetime</span></span></div>
       <div class="rank-badge" id="rankBadge"><span class="rank-icon" id="rankIcon"></span><span class="rank-text"><span class="rank-name">Newbie</span><span class="rank-sub">Rank 1</span></span></div>
     </div>
   <button class="cog-btn" id="cogBtn" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><polygon points="12.00,1.50 15.18,4.33 19.42,4.58 19.67,8.82 22.50,12.00 19.67,15.18 19.42,19.42 15.18,19.67 12.00,22.50 8.82,19.67 4.58,19.42 4.33,15.18 1.50,12.00 4.33,8.82 4.58,4.58 8.82,4.33"/><circle cx="12" cy="12" r="3.3"/></svg></button>
@@ -1381,6 +1496,7 @@
         }
         cloudReady = true;
         loadPurchases();
+        loadAdmin();
         if(syncDirty) pushCloud();
       });
     }).catch(function(e){ syncWarn("Cloud sync failed", e); });
@@ -1581,6 +1697,7 @@
     flushed.then(function(){
       cloudReady = false; cloudUid = null;
       prem = { items: {}, potions: 0, until: 0, loaded: false };
+      isAdmin = false; applySettings();
       if(sb){ try { sb.auth.signOut(); } catch(e){} }
     });
     currentUser = null;
@@ -1821,18 +1938,29 @@
     el.innerHTML = '<div class="panel-header"><h2>Your garden</h2></div>' +
       '<div class="garden-stats"><span>' + trees + ' tree' + (trees === 1 ? "" : "s") + '</span><span>' + flowers + ' flower' + (flowers === 1 ? "" : "s") + '</span><span>' + dead + ' withered</span></div>' +
       buildGardenHtml() +
-      '<p class="garden-hint">Finish a one-time goal to grow a tree and a daily goal to grow a flower. Miss a day and your streak breaks, and everything starts to wither.</p>';
+      '<p class="garden-hint">Finish a one-time goal to grow a tree and a daily goal to grow a flower. Miss a day and your streak breaks, and everything starts to wither.' + (dead && trowelCount() ? ' Tap a withered plant to dig it out with a trowel (you have ' + trowelCount() + ').' : '') + '</p>';
+    bindDig(el);
   }
 
   var ACCENT_SWATCHES = ["#f7d88a", "#a78bfa", "#f472b6", "#34d399", "#38bdf8", "#fb923c"];
   var CURRENCIES = ["\u20b1", "$", "\u20ac", "\u00a3", "\u00a5"];
   function gid(id){ return document.getElementById(id); }
 
+  var isAdmin = false;
+  function loadAdmin(){
+    if(!sb || !cloudUid) return Promise.resolve();
+    var uid = cloudUid;
+    return sb.from("admins").select("user_id").then(function(r){
+      if(cloudUid !== uid || r.error) return;
+      isAdmin = !!(r.data && r.data.length);
+      applySettings();
+    }, function(){});
+  }
   function applySettings(){
     document.body.classList.toggle("reduce-motion", !!state.settings.reduceMotion);
     document.documentElement.classList.toggle("light", state.settings.theme === "light");
     var pb = document.querySelector(".preview-bar");
-    if(pb) pb.style.display = state.settings.showTools === false ? "none" : "";
+    if(pb) pb.style.display = (isAdmin && state.settings.showTools !== false) ? "" : "none";
   }
 
   function renderSettings(){
@@ -1854,7 +1982,7 @@
       '<h3 class="set-h">Preferences</h3>' +
       '<div class="set-row"><span>Sound and vibration<small>A soft chime and buzz on check-off and rank-up</small></span><input type="checkbox" id="setSound" aria-label="Sound and vibration"' + (st.sound !== false ? " checked" : "") + ' /></div>' +
       '<div class="set-row"><span>Currency</span><select id="setCurrency" aria-label="Currency">' + CURRENCIES.map(function(c){ return '<option' + (c === st.currency ? " selected" : "") + '>' + c + '</option>'; }).join("") + '</select></div>' +
-      '<div class="set-row"><span>Show testing tools<small>The +points and reset buttons at the bottom</small></span><input type="checkbox" id="setTools" aria-label="Show testing tools"' + (st.showTools !== false ? " checked" : "") + ' /></div>' +
+      (isAdmin ? '<div class="set-row"><span>Show testing tools<small>The +points and reset buttons at the bottom</small></span><input type="checkbox" id="setTools" aria-label="Show testing tools"' + (st.showTools !== false ? " checked" : "") + ' /></div>' : '') +
       '<h3 class="set-h">Your data</h3>' +
       '<div class="set-actions"><button type="button" class="set-btn" id="setExport">Export backup</button><button type="button" class="set-btn" id="setImportBtn">Import backup</button>' +
       '<button type="button" class="set-btn danger" id="setReset">Reset everything</button></div>' +
@@ -1876,7 +2004,8 @@
     gid("setTheme").addEventListener("change", function(){ state.settings.theme = this.value; persistAndRender(); });
     gid("setMotion").addEventListener("change", function(){ state.settings.reduceMotion = this.checked; persistAndRender(); });
     gid("setSound").addEventListener("change", function(){ state.settings.sound = this.checked; persistAndRender(); });
-    gid("setTools").addEventListener("change", function(){ state.settings.showTools = this.checked; persistAndRender(); });
+    var setToolsEl = gid("setTools");
+    if(setToolsEl) setToolsEl.addEventListener("change", function(){ state.settings.showTools = this.checked; persistAndRender(); });
     gid("setCurrency").addEventListener("change", function(){ state.settings.currency = this.value; persistAndRender(); });
     gid("setExport").addEventListener("click", function(){
       var a = document.createElement("a");
@@ -1915,27 +2044,27 @@
 
   /* ----- shop ----- */
   var SHOP = [
-    {id:"pond",type:"garden",name:"Pond",desc:"A calm pond with lily pads.",cost:60},
-    {id:"fence",type:"garden",name:"Picket fence",desc:"A white fence along the back of your lawn.",cost:40},
-    {id:"butterflies",type:"garden",name:"Butterflies",desc:"Three butterflies that drift over the garden.",cost:80},
-    {id:"t_early",type:"title",name:"Early Bird",desc:"Shown under your photo.",cost:30},
-    {id:"t_hero",type:"title",name:"Habit Hero",desc:"Shown under your photo.",cost:50},
-    {id:"t_keeper",type:"title",name:"Garden Keeper",desc:"Shown under your photo.",cost:50},
-    {id:"f_vine",type:"frame",name:"Vine frame",desc:"A leafy green ring for your photo.",cost:40},
-    {id:"f_flame",type:"frame",name:"Flame frame",desc:"A warm ember ring for your photo.",cost:70},
-    {id:"f_aurora",type:"frame",name:"Aurora frame",desc:"A shifting gold, cyan and violet ring.",cost:90},
-    {id:"f_royal",type:"frame",name:"Royal frame",desc:"A slow, polished gold ring.",cost:110},
-    {id:"f_frost",type:"frame",name:"Frost frame",desc:"An icy ring with falling sparkles.",cost:80},
+    {id:"pond",type:"garden",name:"Pond",desc:"A calm pond with lily pads.",cost:120},
+    {id:"fence",type:"garden",name:"Picket fence",desc:"A white fence along the back of your lawn.",cost:80},
+    {id:"butterflies",type:"garden",name:"Butterflies",desc:"Three butterflies that drift over the garden.",cost:160},
+    {id:"t_early",type:"title",name:"Early Bird",desc:"Shown under your photo.",cost:60},
+    {id:"t_hero",type:"title",name:"Habit Hero",desc:"Shown under your photo.",cost:100},
+    {id:"t_keeper",type:"title",name:"Garden Keeper",desc:"Shown under your photo.",cost:100},
+    {id:"f_vine",type:"frame",name:"Vine frame",desc:"A leafy green ring for your photo.",cost:80},
+    {id:"f_flame",type:"frame",name:"Flame frame",desc:"A warm ember ring for your photo.",cost:140},
+    {id:"f_aurora",type:"frame",name:"Aurora frame",desc:"A shifting gold, cyan and violet ring.",cost:180},
+    {id:"f_royal",type:"frame",name:"Royal frame",desc:"A slow, polished gold ring.",cost:220},
+    {id:"f_frost",type:"frame",name:"Frost frame",desc:"An icy ring with falling sparkles.",cost:160},
     {id:"f_champion",type:"frame",name:"Champion frame",desc:"Prize for the monthly challenge.",cost:0,prize:true},
-    {id:"bench",type:"garden",name:"Garden bench",desc:"A wooden bench to rest on.",cost:50},
-    {id:"lanterns",type:"garden",name:"Lanterns",desc:"Two glowing lamp posts.",cost:70},
-    {id:"windmill",type:"garden",name:"Windmill",desc:"A little windmill with turning blades.",cost:110},
-    {id:"sakura",type:"garden",name:"Cherry blossom tree",desc:"A spring tree in full pink bloom.",cost:90},
-    {id:"maple",type:"garden",name:"Autumn maple",desc:"A golden autumn tree.",cost:90},
-    {id:"b_sprout",type:"badge",name:"Sprout badge",desc:"Shown next to your title.",cost:35},
-    {id:"b_bolt",type:"badge",name:"Bolt badge",desc:"Shown next to your title.",cost:45},
-    {id:"b_moon",type:"badge",name:"Moon badge",desc:"Shown next to your title.",cost:45},
-    {id:"b_crown",type:"badge",name:"Crown badge",desc:"Shown next to your title.",cost:120}
+    {id:"bench",type:"garden",name:"Garden bench",desc:"A wooden bench to rest on.",cost:100},
+    {id:"lanterns",type:"garden",name:"Lanterns",desc:"Two glowing lamp posts.",cost:140},
+    {id:"windmill",type:"garden",name:"Windmill",desc:"A little windmill with turning blades.",cost:220},
+    {id:"sakura",type:"garden",name:"Cherry blossom tree",desc:"A spring tree in full pink bloom.",cost:180},
+    {id:"maple",type:"garden",name:"Autumn maple",desc:"A golden autumn tree.",cost:180},
+    {id:"b_sprout",type:"badge",name:"Sprout badge",desc:"Shown next to your title.",cost:70},
+    {id:"b_bolt",type:"badge",name:"Bolt badge",desc:"Shown next to your title.",cost:90},
+    {id:"b_moon",type:"badge",name:"Moon badge",desc:"Shown next to your title.",cost:90},
+    {id:"b_crown",type:"badge",name:"Crown badge",desc:"Shown next to your title.",cost:240}
   ];
   function owns(id){ return state.shop.owned.indexOf(id) !== -1; }
 
@@ -1997,6 +2126,18 @@
     if(isPending(key)) return '<button class="unlock-btn" disabled>Waiting for confirmation</button>';
     return '<button class="unlock-btn pay-open" data-key="' + key + '" data-price="' + price + '">Buy \u00b7 ' + price + '</button>';
   }
+  function premPreview(i){
+    if(i.type === "frame"){
+      var cls = "fr-" + i.id.slice(2);
+      return '<div class="prem-preview frame"><div class="avatar-fx ' + cls.replace("fr-", "fx-") + '">' + fxParticles(cls) + '<div class="profile-avatar-wrap ' + cls + '"></div></div></div>';
+    }
+    if(i.id === "koi") return '<div class="prem-preview scene"><span class="garden-koi"><i></i><i></i></span></div>';
+    if(i.id === "fairy") return '<div class="prem-preview scene"><span class="garden-fairy"><i></i><i></i><i></i><i></i></span></div>';
+    if(i.id === "greenhouse") return '<div class="prem-preview scene"><span class="garden-greenhouse"><i></i><i></i><i></i></span></div>';
+    if(i.type === "pack") return '<div class="prem-preview packbox"><span class="pack-gem"></span></div>';
+    return "";
+  }
+  function potionIcon(){ return '<div class="prem-preview potionbox"><span class="potion"><i></i><i></i><i></i></span></div>'; }
   function premItem(i, gardenOn){
     var has = ownsPremium(i.id), inline = has && i.type !== "frame", act;
     if(has) act = i.type === "frame"
@@ -2004,16 +2145,16 @@
       : '<span class="feature-state unlocked">Owned</span>';
     else act = buyBtn(i.id, i.price);
     var note = (i.type === "garden" && !gardenOn) ? " Shows once Habit Garden is unlocked." : "";
-    return '<div class="feature-item"><div class="feature-top"><div><div class="feature-name">' + i.name + '</div><div class="feature-desc">' + i.desc + note + '</div></div>' + (inline ? act : "") + '</div>' + (inline ? "" : act) + '</div>';
+    return '<div class="feature-item premium' + (has ? " owned" : "") + '"><div class="feature-top">' + premPreview(i) + '<div class="prem-text"><div class="feature-name">' + i.name + '</div><div class="feature-desc">' + i.desc + note + '</div></div>' + (inline ? act : "") + '</div>' + (inline ? "" : act) + '</div>';
   }
   function potionHtml(){
     var active = potionActive();
     var until = active ? new Date(prem.until).toLocaleString([], {weekday: "short", hour: "numeric", minute: "2-digit"}) : "";
     var drink = '<button class="unlock-btn potion-drink"' + ((!prem.potions || active) ? " disabled" : "") + '>' + (active ? "Active" : "Drink potion") + '</button>';
     var rows = POTIONS.map(function(p){
-      return '<div class="feature-item"><div class="feature-top"><div><div class="feature-name">' + p.name + '</div><div class="feature-desc">' + p.desc + '</div></div></div>' + buyBtn(p.key, p.price) + '</div>';
+      return '<div class="feature-item premium"><div class="feature-top">' + potionIcon() + '<div class="prem-text"><div class="feature-name">' + p.name + '</div><div class="feature-desc">' + p.desc + '</div></div></div>' + buyBtn(p.key, p.price) + '</div>';
     }).join("");
-    return '<div class="feature-item"><div class="feature-top"><div><div class="feature-name">Your potions: ' + prem.potions + '</div><div class="feature-desc">' +
+    return '<div class="feature-item premium"><div class="feature-top">' + potionIcon() + '<div class="prem-text"><div class="feature-name">Your potions: ' + prem.potions + '</div><div class="feature-desc">' +
       (active ? 'x2 points active until ' + until + '.' : 'Doubles the points you can spend for 24 hours. Rank progress is not affected.') + '</div></div>' + drink + '</div></div>' + rows;
   }
   var PAY_METHODS = [
@@ -2087,7 +2228,38 @@
     return '<div class="panel-header secondary"><h2>Premium</h2></div><div class="features-card">' + PREMIUM.map(function(i){ return premItem(i, gardenOn); }).join("") + '</div>' +
       '<div class="panel-header secondary"><h2>Potions</h2></div><div class="features-card">' + potionHtml() + '</div>' + requestsHtml();
   }
+  var TROWEL_COST = 1000;
+  function trowelCount(){ return state.shop.trowels | 0; }
+  function trowelHtml(gardenOn){
+    var can = gardenOn && state.pointsBalance >= TROWEL_COST;
+    return '<div class="panel-header secondary"><h2>Garden tools</h2></div><div class="features-card"><div class="feature-item premium"><div class="feature-top">' +
+      '<div class="prem-preview trowelbox"><span class="trowel"></span></div>' +
+      '<div class="prem-text"><div class="feature-name">Trowel</div><div class="feature-desc">Digs out one withered plant so you can start fresh. You have ' + trowelCount() +
+      (gardenOn ? '. Tap a withered plant in your garden to use one.' : '. Needs the Habit Garden.') + '</div></div></div>' +
+      '<button class="unlock-btn trowel-buy"' + (can ? '' : ' disabled') + '>Buy \u00b7 ' + TROWEL_COST.toLocaleString() + ' pts</button></div></div>';
+  }
+  function bindDig(el){
+    Array.prototype.forEach.call(el.querySelectorAll(".garden-cell.dig"), function(c){
+      c.addEventListener("click", function(){
+        var id = c.dataset.id;
+        var pl = state.garden.filter(function(x){ return x.id === id; })[0];
+        if(!pl || !pl.withered || trowelCount() < 1) return;
+        askConfirm("Dig it out?", "This uses one trowel and removes the withered " + (pl.kind === "tree" ? "tree" : "flower") + " for good.", "Dig it out", function(){
+          state.garden = state.garden.filter(function(x){ return x.id !== id; });
+          state.shop.trowels = Math.max(0, trowelCount() - 1);
+          persistAndRender();
+        });
+      });
+    });
+  }
   function premiumBind(el){
+    var tb = el.querySelector(".trowel-buy");
+    if(tb) tb.addEventListener("click", function(){
+      if(state.pointsBalance < TROWEL_COST) return;
+      state.pointsBalance -= TROWEL_COST;
+      state.shop.trowels = trowelCount() + 1;
+      persistAndRender();
+    });
     Array.prototype.forEach.call(el.querySelectorAll(".prem-equip"), function(b){
       b.addEventListener("click", function(){
         var id = b.dataset.id; if(!ownsPremium(id)) return;
@@ -2130,8 +2302,8 @@
       (owns("bench") ? '<span class="garden-bench"></span>' : "") +
       (owns("pond") ? '<span class="garden-pond"></span>' : "") +
       (ownsPremium("koi") ? '<span class="garden-koi"><i></i><i></i></span>' : "") +
-      (ownsPremium("greenhouse") ? '<span class="garden-greenhouse"></span>' : "") +
-      (ownsPremium("fairy") ? '<span class="garden-fairy"></span>' : "") +
+      (ownsPremium("greenhouse") ? '<span class="garden-greenhouse"><i></i><i></i><i></i></span>' : "") +
+      (ownsPremium("fairy") ? '<span class="garden-fairy"><i></i><i></i><i></i><i></i></span>' : "") +
       (owns("lanterns") ? '<span class="garden-lantern"></span>' : "") +
       (owns("butterflies") ? '<span class="bfly b1"></span><span class="bfly b2"></span><span class="bfly b3"></span>' : "");
   }
@@ -2146,7 +2318,7 @@
       return '<div class="feature-item"><div class="feature-top"><div><div class="feature-name">' + i.name + '</div><div class="feature-desc">' + i.desc + (i.type === "garden" && !gardenOn ? " Needs Habit Garden." : "") + '</div></div>' + (has && i.type === "garden" ? act : "") + '</div>' + (has && i.type === "garden" ? "" : act) + '</div>';
     }
     function sect(t, h){ return '<div class="panel-header secondary"><h2>' + h + '</h2></div><div class="features-card">' + SHOP.filter(function(i){ return i.type === t && !i.prize; }).map(item).join("") + '</div>'; }
-    el.innerHTML = '<div class="shop-balance">Balance <strong>' + state.pointsBalance + ' pts</strong></div>' + premiumHtml(gardenOn) + sect("garden", "Garden items") + sect("title", "Profile titles") + sect("badge", "Profile badges") + sect("frame", "Profile frames");
+    el.innerHTML = '<div class="shop-balance">Balance <strong>' + Number(state.pointsBalance).toLocaleString() + ' pts</strong></div>' + premiumHtml(gardenOn) + trowelHtml(gardenOn) + sect("garden", "Garden items") + sect("title", "Profile titles") + sect("badge", "Profile badges") + sect("frame", "Profile frames");
     Array.prototype.forEach.call(el.querySelectorAll(".shop-buy"), function(b){
       b.addEventListener("click", function(){
         var i = SHOP.filter(function(x){ return x.id === b.dataset.id; })[0];
@@ -2312,11 +2484,14 @@
     });
   }
 
-  function fxParticles(){
-    var f = frameClass(); if(!f) return "";
+  function fxParticles(forCls){
+    var f = forCls || frameClass(); if(!f) return "";
     var sets = {
       "fr-flame":  [[4,38,7,0,3.2,-5],[14,16,6,.8,2.8,4],[28,2,8,1.6,3.4,-3],[50,-2,7,.4,3,2],[72,2,8,1.2,3.3,5],[86,16,6,2.1,2.9,-4],[96,38,7,.6,3.1,6],[40,0,5,2.4,2.7,0]],
       "fr-vine":   [[10,6,8,0,6,8],[90,14,7,1.5,7,-8],[50,-6,8,3,6.5,5],[26,-2,6,4.2,7.5,-6],[78,0,7,2.2,6.8,7],[97,56,6,5,7,-10]],
+      "fr-galaxy": [[105.7,62.5,4,0.0,2.6,0],[92.7,83.1,6,0.4,3.4,0],[71.3,97.6,5,0.7,3.0,0],[45.6,100.3,7,1.1,4.0,0],[20.8,94.5,4,1.5,2.6,0],[1.8,77.0,5,1.9,3.4,0],[-7.7,54.3,4,2.2,3.0,0],[-5.7,28.5,6,2.6,4.0,0],[7.3,7.4,5,3.0,2.6,0],[28.7,-7.6,7,0.2,3.4,0],[54.4,-9.8,4,0.6,3.0,0],[79.2,-3.0,5,1.0,4.0,0],[98.2,14.5,4,1.3,2.6,0],[107.7,36.7,6,1.7,3.4,0]],
+      "fr-neon": [[104.7,61.8,5,0.0,1.8,0],[88.9,84.8,7,0.4,2.4,0],[62.7,99.1,5,0.7,2.1,0],[33.1,97.5,6,1.1,1.8,0],[8.0,82.9,5,1.5,2.4,0],[-5.9,56.7,7,1.9,2.1,0],[-4.7,29.2,5,2.2,1.8,0],[11.1,4.7,6,2.6,2.4,0],[37.3,-8.1,5,3.0,2.1,0],[66.9,-8.0,7,0.2,1.8,0],[92.0,8.1,5,0.6,2.4,0],[105.9,32.8,6,1.0,2.1,0]],
+      "fr-phoenix": [[8,30,7,0,2.6,-6],[18,12,6,0.5,2.2,5],[30,0,8,1.1,2.8,-4],[44,-6,6,0.3,2.4,3],[58,-6,7,1.5,2.7,-3],[70,0,8,0.9,2.5,5],[82,12,6,1.9,2.3,-5],[92,30,7,0.2,2.6,6],[24,40,5,2.2,2.9,-7],[76,40,5,1.3,2.1,7],[50,-10,9,0.7,3.1,0],[12,56,5,2.6,2.8,-5],[88,56,5,0.1,2.4,5]],
       "fr-aurora": [[8,18,5,0,4,0],[92,30,6,1.3,4.6,0],[50,-4,5,2.6,4.2,0],[24,2,4,3.4,5,0],[80,4,5,.8,4.4,0],[98,70,4,2,5.2,0],[2,64,4,3.8,4.8,0]]
     };
     return (sets[f] || (f === "fr-phoenix" ? sets["fr-flame"] : (f === "fr-royal" || f === "fr-frost" || f === "fr-champion" || f === "fr-galaxy" || f === "fr-neon" ? sets["fr-aurora"] : []))).map(function(a){
@@ -2473,7 +2648,8 @@
 
   function renderHeader(){
     document.getElementById("streakValue").textContent = state.streak.current;
-    document.getElementById("pointsValue").textContent = state.pointsBalance;
+    document.getElementById("pointsValue").textContent = Number(state.pointsBalance).toLocaleString();
+    document.getElementById("lifetimeValue").textContent = Number(state.lifetimePoints).toLocaleString();
 
     var rank = getRank(state.lifetimePoints);
     var next = getNextRank(state.lifetimePoints);
@@ -2613,7 +2789,7 @@
     return '<div class="garden-scene"><div class="garden-sky"><span class="sun"></span><span class="cloud c1"></span><span class="cloud c2"></span></div><div class="garden-lawn">' + decorHtml() +
       plants.map(function(p){
         var label = (p.kind === "tree" ? "Tree" : "Flower") + " \u00b7 " + fmtDate(p.date) + (p.withered ? " \u00b7 withered" : "");
-        return '<span class="garden-cell" title="' + label + '">' + plantSvg(p.kind, p.withered, hashStr(p.id)) + '</span>';
+        return '<span class="garden-cell' + (p.withered && trowelCount() ? " dig" : "") + '" data-id="' + p.id + '" title="' + label + '">' + plantSvg(p.kind, p.withered, hashStr(p.id)) + '</span>';
       }).join("") + '</div></div>';
   }
 
@@ -3283,7 +3459,7 @@
   initAuthScreen();
 })();
 </script>
-<div id="appVersion" style="position:fixed;left:10px;bottom:calc(6px + env(safe-area-inset-bottom, 0px));z-index:10;font-size:11px;opacity:.55;color:var(--text-muted);pointer-events:none;">v0.5.1</div>
+<div id="appVersion" style="position:fixed;left:10px;bottom:calc(6px + env(safe-area-inset-bottom, 0px));z-index:10;font-size:11px;opacity:.55;color:var(--text-muted);pointer-events:none;">v0.6.1</div>
 <script>
 if ("serviceWorker" in navigator && location.protocol === "https:") {
   window.addEventListener("load", function () {
